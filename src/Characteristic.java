@@ -60,6 +60,6 @@ public class Characteristic {
 
     @Override
     public String toString() {
-        return "distance = " + distance + ", time = " + time + ", cost = " + cost;
+        return "d - " + distance + "\n" + " t - " + time + "\n" + " c - " + cost;
     }
 }

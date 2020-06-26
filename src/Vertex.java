@@ -35,12 +35,12 @@ public class Vertex {
         if (this == object) return true;
         if (object == null || getClass() != object.getClass()) return false;
         Vertex vertex = (Vertex) object;
-        return number == vertex.number && name.equals(vertex.name);
+        return name.equals(vertex.name) || number == vertex.number;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, number);
+        return Objects.hash(name);
     }
 
     @Override

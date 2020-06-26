@@ -59,10 +59,31 @@ public class App {
         deletingButton.addActionListener(e -> graphicPanel.setDeletingMode());
         leftPanel.add(deletingButton);
 
+        JRadioButton chooseVertexMode = new JRadioButton("Choose vertex", false);
+        chooseVertexMode.setFont(FONT_BUTTON);
+        chooseVertexMode.addActionListener(e -> graphicPanel.setChooseVertexMode());
+        leftPanel.add(chooseVertexMode);
+
         ButtonGroup buttonGroup = new ButtonGroup();
         buttonGroup.add(creatingButton);
         buttonGroup.add(connectingButton);
         buttonGroup.add(deletingButton);
+        buttonGroup.add(chooseVertexMode);
+
+        JButton showQuick = new JButton("Show quick path");
+        showQuick.setFont(FONT_BUTTON);
+        showQuick.addActionListener(e -> graphicPanel.showPath(TypeRoad.QUICK));
+        leftPanel.add(showQuick);
+
+        JButton showShort = new JButton("Show short path");
+        showShort.setFont(FONT_BUTTON);
+        showShort.addActionListener(e -> graphicPanel.showPath(TypeRoad.SHORT));
+        leftPanel.add(showShort);
+
+        JButton showCheaper = new JButton("Show cheaper path");
+        showCheaper.setFont(FONT_BUTTON);
+        showCheaper.addActionListener(e -> graphicPanel.showPath(TypeRoad.CHEAP));
+        leftPanel.add(showCheaper);
 
         JButton clearButton = new JButton("Clear");
         clearButton.setFont(FONT_BUTTON);
@@ -83,6 +104,24 @@ public class App {
         readFileButton.setFont(FONT_BUTTON);
         readFileButton.addActionListener(e -> fileManager.readGraphFromFile());
         leftPanel.add(readFileButton);
+
+        JCheckBox nameCheck = new JCheckBox("Show name");
+        nameCheck.setFont(FONT_BUTTON);
+        nameCheck.addActionListener(e -> {
+            if (nameCheck.isSelected()) graphicPanel.setShowName(true);
+            else graphicPanel.setShowName(false);
+            graphicPanel.repaint();
+        });
+        leftPanel.add(nameCheck);
+
+        JCheckBox weightCheck = new JCheckBox("Show characteristics");
+        weightCheck.setFont(FONT_BUTTON);
+        weightCheck.addActionListener(e -> {
+            if (weightCheck.isSelected()) graphicPanel.setShowWeight(true);
+            else graphicPanel.setShowWeight(false);
+            graphicPanel.repaint();
+        });
+        leftPanel.add(weightCheck);
     }
 
 }

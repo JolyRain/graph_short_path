@@ -3,6 +3,7 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Line2D;
+import java.awt.geom.Rectangle2D;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
@@ -16,26 +17,47 @@ public class PaintGraphPanel extends JPanel {
     private static final int LINE_WIDTH = 35;
     private static final int LINE_HEIGHT = 5;
     private static final int ZERO = 0;
+    private static final int LABEL_CHROMATIC_NUMBER_X = 10;
+    private static final int LABEL_CHROMATIC_NUMBER_Y = 660;
 
     private List<Node> nodes = new LinkedList<>();
     private List<Line> lines = new LinkedList<>();
     private Graph graph = new Graph();
+    private Path path = new Path(graph);
 
     private CreatingVertexMode creatingVertexMode = new CreatingVertexMode();
     private DeletingMode deletingMode = new DeletingMode();
     private ConnectingVertexMode connectingVertexMode = new ConnectingVertexMode();
+    private ChooseVertexMode chooseVertexMode = new ChooseVertexMode();
     private InputRoadCharacteristics inputRoad = new InputRoadCharacteristics();
     private InputVertex inputVertex = new InputVertex();
 
+    private boolean showName = false;
+    private boolean showWeight = false;
+
     PaintGraphPanel() {
         setCreatingMode();
+    }
 
+    private void countPath() {
+        if (chooseVertexMode.startNode != null && chooseVertexMode.endNode != null) {
+            Vertex start = chooseVertexMode.startNode.getVertex();
+            Vertex end = chooseVertexMode.endNode.getVertex();
+            path.countPath(start, end);
+        }
+        if (path.getSum() < 0) {
+            JOptionPane.showMessageDialog(null, "There is no way...",
+                    "Error", JOptionPane.ERROR_MESSAGE);
+            clearPath();
+        }
     }
 
     public void paint(Graphics graphics) {
         Graphics2D graphics2D = (Graphics2D) graphics;
         setPaintSettings(graphics2D);
         paintLines(graphics2D);
+        if (path != null) paintPath(graphics2D);
+        if (showWeight) paintWeight(graphics2D);
         paintVertices(graphics2D);
     }
 
@@ -48,10 +70,17 @@ public class PaintGraphPanel extends JPanel {
         graphics2D.setColor(Color.BLACK);
     }
 
+    private void clearPath() {
+        path.clear();
+        chooseVertexMode.clear();
+        repaint();
+    }
+
     void clear() {
         graph.clear();
         nodes.clear();
         lines.clear();
+        path.clear();
         repaint();
     }
 
@@ -59,9 +88,49 @@ public class PaintGraphPanel extends JPanel {
         for (Line road : lines) {
             Line2D line = road.getLine();
             graphics2D.draw(line);
-            graphics2D.drawString(road.getEdge().getCharacteristic().toString(),
-                    (float) line.getX2() / 2, (float) line.getY2() / 2);
         }
+    }
+
+    private void paintWeight(Graphics2D graphics2D) {
+        for (Line road : lines) {
+            Characteristic characteristic = road.getEdge().getCharacteristic();
+            graphics2D.setColor(Color.WHITE);
+            Rectangle2D label = road.getWeightLabel(graphics2D);
+            graphics2D.fill(label);
+            graphics2D.setColor(Color.BLACK);
+            graphics2D.drawString(characteristic.toString(),
+                    (float) label.getX(),
+                    (float) (label.getY() + label.getHeight()));
+        }
+    }
+
+    private void paintPath(Graphics2D graphics2D) {
+        for (Line road : lines) {
+            Line2D line = road.getLine();
+            Edge edge = road.getEdge();
+            if (path.contains(edge)) {
+                graphics2D.setColor(Color.RED);
+                graphics2D.draw(line);
+            }
+        }
+    }
+
+    public void showPath(TypeRoad typeRoad) {
+        switch (typeRoad) {
+            case QUICK:
+                path = new Path(graph, TypeRoad.QUICK);
+                countPath();
+                break;
+            case SHORT:
+                path = new Path(graph, TypeRoad.SHORT);
+                countPath();
+                break;
+            case CHEAP:
+                path = new Path(graph, TypeRoad.CHEAP);
+                countPath();
+                break;
+        }
+        repaint();
     }
 
     private void paintVertices(Graphics2D graphics2D) {
@@ -71,32 +140,53 @@ public class PaintGraphPanel extends JPanel {
             circle = node.getCircle();
             vertex = node.getVertex();
             if (node.equals(connectingVertexMode.startNode)) graphics2D.setColor(Color.RED);
+            else if (node.equals(chooseVertexMode.startNode) || node.equals(chooseVertexMode.endNode))
+                graphics2D.setColor(Color.RED);
             else graphics2D.setColor(Color.BLACK);
             graphics2D.draw(circle);
             graphics2D.setColor(Color.WHITE);
             graphics2D.fill(node.getCircle());
             graphics2D.setColor(Color.BLACK);
-            graphics2D.drawString(vertex.getName(), (float) circle.getX(), (float) circle.getY() - 10);
             graphics2D.drawString(String.valueOf(vertex.getNumber()), node.getNumberX(), node.getNumberY());
+            if (showName) {
+                graphics2D.drawString(vertex.getName(), (float) circle.getX(), (float) circle.getY() - 10);
+            }
         }
     }
 
     void setCreatingMode() {
+        clearPath();
+        connectingVertexMode.clear();
         removeMouseListener(connectingVertexMode);
         removeMouseListener(deletingMode);
+        removeMouseListener(chooseVertexMode);
         addMouseListener(creatingVertexMode);
     }
 
     void setDeletingMode() {
+        clearPath();
+        connectingVertexMode.clear();
         removeMouseListener(connectingVertexMode);
         removeMouseListener(creatingVertexMode);
+        removeMouseListener(chooseVertexMode);
         addMouseListener(deletingMode);
     }
 
     void setModeConnecting() {
+        clearPath();
+        connectingVertexMode.clear();
         removeMouseListener(deletingMode);
         removeMouseListener(creatingVertexMode);
+        removeMouseListener(chooseVertexMode);
         addMouseListener(connectingVertexMode);
+    }
+
+    void setChooseVertexMode() {
+        connectingVertexMode.clear();
+        removeMouseListener(connectingVertexMode);
+        removeMouseListener(creatingVertexMode);
+        removeMouseListener(deletingMode);
+        addMouseListener(chooseVertexMode);
     }
 
     @Override
@@ -193,6 +283,130 @@ public class PaintGraphPanel extends JPanel {
         return operator.apply(Circle.RADIUS);
     }
 
+    public boolean isShowName() {
+        return showName;
+    }
+
+    public void setShowName(boolean showName) {
+        this.showName = showName;
+    }
+
+    public boolean isShowWeight() {
+        return showWeight;
+    }
+
+    public void setShowWeight(boolean showWeight) {
+        this.showWeight = showWeight;
+    }
+
+    private static class InputRoadCharacteristics extends JPanel {
+
+        private JTextField distanceField = new JTextField(5);
+        private JTextField timeField = new JTextField(5);
+        private JTextField costField = new JTextField(5);
+
+        InputRoadCharacteristics() {
+            this.add(new JLabel("distance:"));
+            this.add(distanceField);
+            this.add(new JLabel("time:"));
+            this.add(timeField);
+            this.add(new JLabel("cost:"));
+            this.add(costField);
+        }
+
+        private void clear() {
+            distanceField.setText("");
+            timeField.setText("");
+            costField.setText("");
+        }
+
+        Characteristic getCharacteristic() {
+            clear();
+            Characteristic characteristic = new Characteristic();
+            this.setVisible(true);
+            int result = JOptionPane.showConfirmDialog(null, this,
+                    "Please enter the characteristic of road", JOptionPane.OK_CANCEL_OPTION);
+            if (result == JOptionPane.OK_OPTION) {
+                try {
+                    characteristic.setDistance(Integer.parseInt(distanceField.getText()));
+                    characteristic.setTime(Integer.parseInt(timeField.getText()));
+                    characteristic.setCost(Integer.parseInt(costField.getText()));
+                    if (!characteristic.isValid()) throw new NumberFormatException();
+                } catch (NumberFormatException e) {
+                    JOptionPane.showMessageDialog(null, "Invalid input",
+                            "Error", JOptionPane.ERROR_MESSAGE);
+                    return null;
+                }
+            } else return null;
+            return characteristic;
+        }
+    }
+
+    private static class InputVertex extends JPanel {
+        private JTextField nameField = new JTextField(15);
+
+        InputVertex() {
+            this.add(new JLabel("Name:"));
+            this.add(nameField);
+        }
+
+        private void clear() {
+            nameField.setText("");
+        }
+
+        String getNameVertex() {
+            String name = null;
+            clear();
+            this.setVisible(true);
+            int result = JOptionPane.showConfirmDialog(null, this,
+                    "Please enter the name of city", JOptionPane.OK_CANCEL_OPTION);
+            if (result == JOptionPane.OK_OPTION) {
+                name = nameField.getText();
+            }
+            return name;
+        }
+    }
+
+    private class ChooseVertexMode extends MouseAdapter {
+        Node startNode;
+        Node endNode;
+        private boolean startClicked = false;
+        private boolean endClicked = false;
+
+        @Override
+        public void mouseClicked(MouseEvent event) {
+            double x = event.getX();
+            double y = event.getY();
+            for (Node node : nodes) {
+                if (!startClicked) {
+                    if (node.getCircle().contains(x, y)) {
+                        startNode = node;
+                        startClicked = true;
+                        break;
+                    }
+                } else if (endClicked) {
+                    if (node.getCircle().contains(x, y)) {
+                        clearPath();
+                        break;
+                    }
+                } else if (node.getCircle().contains(x, y)) {
+                    path.clear();
+                    endNode = node;
+                    endClicked = true;
+                    break;
+                }
+            }
+            repaint();
+        }
+
+        private void clear() {
+            startNode = null;
+            endNode = null;
+            startClicked = false;
+            endClicked = false;
+        }
+    }
+
     private class CreatingVertexMode extends MouseAdapter {
         @Override
         public void mouseClicked(MouseEvent event) {
@@ -201,10 +415,14 @@ public class PaintGraphPanel extends JPanel {
             String name = inputVertex.getNameVertex();
             if (name == null || name.equals("")) return;
             Vertex newVertex = new Vertex();
-            graph.addVertex(newVertex);
-            nodes.add(new Node(newVertex, new Circle(x, y)));
             newVertex.setName(name);
-            repaint();
+            if (graph.addVertex(newVertex)) {
+                nodes.add(new Node(newVertex, new Circle(x, y)));
+                repaint();
+            } else {
+                JOptionPane.showMessageDialog(null, "Two cities have the same name!",
+                        "Error", JOptionPane.ERROR_MESSAGE);
+            }
         }
     }
 
@@ -267,7 +485,7 @@ public class PaintGraphPanel extends JPanel {
     private class ConnectingVertexMode extends MouseAdapter {
         Node startNode;
         Line newLine;
-        boolean vertexClicked = false;
+        private boolean vertexClicked = false;
 
         @Override
         public void mouseClicked(MouseEvent e) {
@@ -282,7 +500,7 @@ public class PaintGraphPanel extends JPanel {
                     clear();
                     break;
                 } else if (node.getCircle().contains(e.getX(), e.getY())) {
-                    setNewLine(node);
+                    if (!setNewLine(node)) return;
                     lines.add(newLine);
                     graph.addEdge(newLine.getEdge());
                     clear();
@@ -292,13 +510,13 @@ public class PaintGraphPanel extends JPanel {
             repaint();
         }
 
-        private void setNewLine(Node node) {
+        private boolean setNewLine(Node node) {
             Circle circleStart = startNode.getCircle();
             Circle circleEnd = node.getCircle();
             double radius = correctRadius();
             Edge newEdge = new Edge(startNode.getVertex(), node.getVertex());
             Characteristic characteristic = inputRoad.getCharacteristic();
-            if (characteristic == null) return;
+            if (characteristic == null) return false;
             newEdge.setCharacteristic(characteristic);
             newLine = new Line(new Line2D.Double(
                     circleStart.getX() + radius,
@@ -306,77 +524,13 @@ public class PaintGraphPanel extends JPanel {
                     circleEnd.getX() + radius,
                     circleEnd.getY() + radius),
                     newEdge);
+            return true;
         }
 
         private void clear() {
             startNode = null;
             newLine = null;
             vertexClicked = false;
-        }
-    }
-
-    private static class InputRoadCharacteristics extends JPanel {
-
-        private JTextField distanceField = new JTextField(5);
-        private JTextField timeField = new JTextField(5);
-        private JTextField costField = new JTextField(5);
-
-        InputRoadCharacteristics() {
-            this.add(new JLabel("distance:"));
-            this.add(distanceField);
-            this.add(new JLabel("time:"));
-            this.add(timeField);
-            this.add(new JLabel("cost:"));
-            this.add(costField);
-        }
-        private void clear(){
-            distanceField.setText("");
-            timeField.setText("");
-            costField.setText("");
-        }
-
-        Characteristic getCharacteristic() {
-            clear();
-            Characteristic characteristic = new Characteristic();
-            this.setVisible(true);
-            int result = JOptionPane.showConfirmDialog(null, this,
-                    "Please Enter X and Y Values", JOptionPane.OK_CANCEL_OPTION);
-            if (result == JOptionPane.OK_OPTION) {
-                try {
-                    characteristic.setDistance(Integer.parseInt(distanceField.getText()));
-                    characteristic.setTime(Integer.parseInt(timeField.getText()));
-                    characteristic.setCost(Integer.parseInt(costField.getText()));
-                    if (!characteristic.isValid()) throw new NumberFormatException();
-                } catch (NumberFormatException e) {
-                    JOptionPane.showMessageDialog(null, "Invalid input", "Error", JOptionPane.ERROR_MESSAGE);
-                }
-            } else return null;
-            return characteristic;
-        }
-    }
-
-    private static class InputVertex extends JPanel {
-        private JTextField nameField = new JTextField(15);
-
-        InputVertex() {
-            this.add(new JLabel("Name:"));
-            this.add(nameField);
-        }
-
-        private void clear(){
-            nameField.setText("");
-        }
-
-        String getNameVertex() {
-            String name = null;
-clear();
-            this.setVisible(true);
-            int result = JOptionPane.showConfirmDialog(null, this,
-                    "Please enter the name of city", JOptionPane.OK_CANCEL_OPTION);
-            if (result == JOptionPane.OK_OPTION) {
-                name = nameField.getText();
-            }
-            return name;
         }
     }
 }

@@ -5,11 +5,10 @@ public class Graph {
     private Set<Vertex> vertices = new HashSet<>();
     private List<Edge> edges = new LinkedList<>();
 
-    public void addVertex(Vertex vertex) {
+    public boolean addVertex(Vertex vertex) {
         vertex.setNumber(vertices.size());
         adjacentVerticesMap.put(vertex, new HashSet<>());
-        vertices.add(vertex);
-
+        return vertices.add(vertex);
     }
 
     private boolean isAdjacent(Vertex firstVertex, Vertex secondVertex) {
@@ -21,6 +20,12 @@ public class Graph {
         return false;
     }
 
+    public Edge getEdge(Vertex start, Vertex end) {
+        for (Edge edge : edges) {
+            if (edge.contains(start) && edge.contains(end)) return edge;
+        }
+        return null;
+    }
 
     public void addEdge(Vertex startVertex, Vertex endVertex) {
         if (!isAdjacent(startVertex, endVertex)) {
@@ -36,13 +41,9 @@ public class Graph {
         if (!isAdjacent(startVertex, endVertex)) {
             adjacentVerticesMap.get(startVertex).add(endVertex);
             adjacentVerticesMap.get(endVertex).add(startVertex);
-            edges.add(new Edge(startVertex, endVertex));
+            edges.add(edge);
         }
     }
-//
-//    private String getName(Vertex vertex) {
-//        return String.valueOf(vertex.getNumber());
-//    }
 
     public void removeVertex(Vertex deletingVertex) {
         vertices.remove(deletingVertex);
