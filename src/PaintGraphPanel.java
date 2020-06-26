@@ -56,9 +56,18 @@ public class PaintGraphPanel extends JPanel {
         Graphics2D graphics2D = (Graphics2D) graphics;
         setPaintSettings(graphics2D);
         paintLines(graphics2D);
-        if (path != null) paintPath(graphics2D);
-        if (showWeight) paintWeight(graphics2D);
+        if (path != null) {
+            paintPath(graphics2D);
+            if (path.getTypeRoad() != null) paintSum(graphics2D);
+        }
         paintVertices(graphics2D);
+        paintLegend(graphics2D);
+    }
+
+    private void paintSum(Graphics2D graphics2D) {
+        graphics2D.setColor(Color.BLACK);
+        graphics2D.drawString("SUM OF " + path.getTypeRoad() + " PATH: " + path.getSum(),
+                LABEL_CHROMATIC_NUMBER_X, LABEL_CHROMATIC_NUMBER_Y);
     }
 
     private void setPaintSettings(Graphics2D graphics2D) {
@@ -91,16 +100,28 @@ public class PaintGraphPanel extends JPanel {
         }
     }
 
-    private void paintWeight(Graphics2D graphics2D) {
-        for (Line road : lines) {
-            Characteristic characteristic = road.getEdge().getCharacteristic();
-            graphics2D.setColor(Color.WHITE);
-            Rectangle2D label = road.getWeightLabel(graphics2D);
-            graphics2D.fill(label);
-            graphics2D.setColor(Color.BLACK);
-            graphics2D.drawString(characteristic.toString(),
-                    (float) label.getX(),
-                    (float) (label.getY() + label.getHeight()));
+    private void paintLegend(Graphics2D graphics2D) {
+        if (showWeight) {
+            for (Line road : lines) {
+                Characteristic characteristic = road.getEdge().getCharacteristic();
+                graphics2D.setColor(Color.WHITE);
+                Rectangle2D label = road.getWeightLabel(graphics2D);
+                graphics2D.fill(label);
+                graphics2D.setColor(Color.BLACK);
+                graphics2D.drawString(characteristic.toString(),
+                        (float) label.getX(),
+                        (float) (label.getY() + label.getHeight()));
+            }
+        }
+        if (showName) {
+            for (Node node : nodes) {
+                graphics2D.setColor(Color.WHITE);
+                Rectangle2D nameRect = node.getRectName(graphics2D);
+                graphics2D.fill(nameRect);
+                graphics2D.setColor(Color.BLACK);
+                graphics2D.drawString(node.getVertex().getName(),
+                        (float) nameRect.getX(), (float) (nameRect.getY() + nameRect.getHeight()));
+            }
         }
     }
 
@@ -115,7 +136,7 @@ public class PaintGraphPanel extends JPanel {
         }
     }
 
-    public void showPath(TypeRoad typeRoad) {
+    void showPath(TypeRoad typeRoad) {
         switch (typeRoad) {
             case QUICK:
                 path = new Path(graph, TypeRoad.QUICK);
@@ -148,44 +169,35 @@ public class PaintGraphPanel extends JPanel {
             graphics2D.fill(node.getCircle());
             graphics2D.setColor(Color.BLACK);
             graphics2D.drawString(String.valueOf(vertex.getNumber()), node.getNumberX(), node.getNumberY());
-            if (showName) {
-                graphics2D.drawString(vertex.getName(), (float) circle.getX(), (float) circle.getY() - 10);
-            }
         }
     }
 
-    void setCreatingMode() {
+    private void removeAllListeners() {
         clearPath();
         connectingVertexMode.clear();
         removeMouseListener(connectingVertexMode);
         removeMouseListener(deletingMode);
         removeMouseListener(chooseVertexMode);
+        removeMouseListener(creatingVertexMode);
+    }
+
+    void setCreatingMode() {
+        removeAllListeners();
         addMouseListener(creatingVertexMode);
     }
 
     void setDeletingMode() {
-        clearPath();
-        connectingVertexMode.clear();
-        removeMouseListener(connectingVertexMode);
-        removeMouseListener(creatingVertexMode);
-        removeMouseListener(chooseVertexMode);
+        removeAllListeners();
         addMouseListener(deletingMode);
     }
 
     void setModeConnecting() {
-        clearPath();
-        connectingVertexMode.clear();
-        removeMouseListener(deletingMode);
-        removeMouseListener(creatingVertexMode);
-        removeMouseListener(chooseVertexMode);
+        removeAllListeners();
         addMouseListener(connectingVertexMode);
     }
 
     void setChooseVertexMode() {
-        connectingVertexMode.clear();
-        removeMouseListener(connectingVertexMode);
-        removeMouseListener(creatingVertexMode);
-        removeMouseListener(deletingMode);
+        removeAllListeners();
         addMouseListener(chooseVertexMode);
     }
 
@@ -206,9 +218,14 @@ public class PaintGraphPanel extends JPanel {
     private Node readNodeFromFile(String string) throws Exception {
         double x, y;
         int vertexNumber;
+        String name;
         Pattern pattern = Pattern.compile("\\{([\\d]+)}");
         Matcher matcher = pattern.matcher(string);
         if (matcher.find()) vertexNumber = Integer.parseInt(matcher.group(1));
+        else throw new Exception("Wrong format");
+        pattern = Pattern.compile("<([A-zА-я0-9]+)>");
+        matcher = pattern.matcher(string);
+        if (matcher.find()) name = matcher.group(1);
         else throw new Exception("Wrong format");
         pattern = Pattern.compile("\\(+([\\d]+\\.0), ([\\d]+\\.0)\\)");
         matcher = pattern.matcher(string);
@@ -216,7 +233,7 @@ public class PaintGraphPanel extends JPanel {
             x = Double.parseDouble(matcher.group(1));
             y = Double.parseDouble(matcher.group(2));
         } else throw new Exception("Wrong format");
-        Vertex newVertex = new Vertex(vertexNumber);
+        Vertex newVertex = new Vertex(name, vertexNumber);
         Circle newCircle = new Circle(x, y);
         return new Node(newVertex, newCircle);
     }
@@ -238,17 +255,27 @@ public class PaintGraphPanel extends JPanel {
     }
 
     private void readEdgeFromFile(String string) throws Exception {
-//        int startVertex, secondVertex;
-//        Pattern pattern = Pattern.compile("<\\{([\\d]+)}, \\{([\\d]+)}>");
-//        Matcher matcher = pattern.matcher(string);
-//        if (matcher.find()) {
-//            startVertex = Integer.parseInt(matcher.group(1));
-//            secondVertex = Integer.parseInt(matcher.group(2));
-//        } else throw new Exception("Wrong format");
-//        Node firstNode = nodes.get(graph.getVertices().get(startVertex).getNumber());
-//        Node secondNode = nodes.get(graph.getVertices().get(secondVertex).getNumber());
-//        graph.addEdge(graph.getVertices().get(startVertex), graph.getVertices().get(secondVertex));
-//        lines.add(setNewLine(firstNode, secondNode));
+        int startVertex, endVertex;
+        int distance, time, cost;
+        Pattern pattern = Pattern.compile("<\\{([\\d]+)}, \\{([\\d]+)}>");
+        Matcher matcher = pattern.matcher(string);
+        if (matcher.find()) {
+            startVertex = Integer.parseInt(matcher.group(1));
+            endVertex = Integer.parseInt(matcher.group(2));
+        } else throw new Exception("Wrong format");
+        pattern = Pattern.compile("\\{d-(\\d+), t-(\\d+), c-(\\d+)}");
+        matcher = pattern.matcher(string);
+        if (matcher.find()) {
+            distance = Integer.parseInt(matcher.group(1));
+            time = Integer.parseInt(matcher.group(2));
+            cost = Integer.parseInt(matcher.group(3));
+        } else throw new Exception("Wrong Format");
+        Node firstNode = nodes.get(graph.getVertex(startVertex).getNumber());
+        Node secondNode = nodes.get(graph.getVertex(endVertex).getNumber());
+        Edge newEdge = new Edge(graph.getVertex(startVertex), graph.getVertex(endVertex));
+        newEdge.setCharacteristic(new Characteristic(distance, time, cost));
+        graph.addEdge(newEdge);
+        lines.add(setNewLine(firstNode, secondNode));
     }
 
     void readGraphFromFile(Scanner scanner) throws Exception {
@@ -275,7 +302,7 @@ public class PaintGraphPanel extends JPanel {
                 circleStart.getY() + radius,
                 circleEnd.getX() + radius,
                 circleEnd.getY() + radius),
-                new Edge(startNode.getVertex(), endNode.getVertex()));
+                graph.getEdge(startNode.getVertex(), endNode.getVertex()));
     }
 
     private double correctRadius() {
@@ -283,19 +310,11 @@ public class PaintGraphPanel extends JPanel {
         return operator.apply(Circle.RADIUS);
     }
 
-    public boolean isShowName() {
-        return showName;
-    }
-
-    public void setShowName(boolean showName) {
+    void setShowName(boolean showName) {
         this.showName = showName;
     }
 
-    public boolean isShowWeight() {
-        return showWeight;
-    }
-
-    public void setShowWeight(boolean showWeight) {
+    void setShowWeight(boolean showWeight) {
         this.showWeight = showWeight;
     }
 
@@ -325,7 +344,7 @@ public class PaintGraphPanel extends JPanel {
             Characteristic characteristic = new Characteristic();
             this.setVisible(true);
             int result = JOptionPane.showConfirmDialog(null, this,
-                    "Please enter the characteristic of road", JOptionPane.OK_CANCEL_OPTION);
+                    "Enter the characteristic of road", JOptionPane.OK_CANCEL_OPTION);
             if (result == JOptionPane.OK_OPTION) {
                 try {
                     characteristic.setDistance(Integer.parseInt(distanceField.getText()));
@@ -359,7 +378,7 @@ public class PaintGraphPanel extends JPanel {
             clear();
             this.setVisible(true);
             int result = JOptionPane.showConfirmDialog(null, this,
-                    "Please enter the name of city", JOptionPane.OK_CANCEL_OPTION);
+                    "Enter the name of city", JOptionPane.OK_CANCEL_OPTION);
             if (result == JOptionPane.OK_OPTION) {
                 name = nameField.getText();
             }

@@ -6,12 +6,12 @@ public class Path {
     private Stack<Edge> path = new Stack<>();
     private int sum = 0;
 
-    public Path(Graph graph, TypeRoad typeRoad) {
+    Path(Graph graph, TypeRoad typeRoad) {
         this.graph = graph;
         this.typeRoad = typeRoad;
     }
 
-    public Path(Graph graph) {
+    Path(Graph graph) {
         this.graph = graph;
     }
 
@@ -25,11 +25,11 @@ public class Path {
         return value;
     }
 
-    public boolean contains(Edge edge) {
+    boolean contains(Edge edge) {
         return path.contains(edge);
     }
 
-    public void countPath(Vertex startVertex, Vertex endVertex) {
+    void countPath(Vertex startVertex, Vertex endVertex) {
         if (startVertex.equals(endVertex)) {
             sum = -1;
             return;
@@ -83,27 +83,17 @@ public class Path {
         }
     }
 
-    public void clear() {
+    void clear() {
         typeRoad = null;
         sum = 0;
         path.clear();
     }
 
-
-
-    public Stack<Edge> getPath() {
-        return path;
-    }
-
-    public void setPath(Stack<Edge> path) {
-        this.path = path;
-    }
-
-    public int getSum() {
+    int getSum() {
         return sum;
     }
 
-    public void setSum(int sum) {
-        this.sum = sum;
+    TypeRoad getTypeRoad() {
+        return typeRoad;
     }
 }

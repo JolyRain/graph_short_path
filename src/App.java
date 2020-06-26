@@ -1,7 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
 
-public class App {
+class App {
     private static final int WIDTH = 1280;
     private static final int HEIGHT = 720;
     private static final int ZERO = 0;
@@ -12,7 +12,7 @@ public class App {
     private JPanel leftPanel;
     private FileManager fileManager;
 
-    public App() {
+    App() {
         createFrame();
         initElements();
         fileManager = new FileManager(graphicPanel);
@@ -20,7 +20,7 @@ public class App {
     }
 
     private void createFrame() {
-        frame = new JFrame("Coloring graph");
+        frame = new JFrame("Freight map");
         frame.setSize(WIDTH, HEIGHT);
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         frame.setLocationRelativeTo(null);
@@ -28,7 +28,7 @@ public class App {
         frame.setResizable(false);
     }
 
-    public void show() {
+    void show() {
         frame.setVisible(true);
     }
 
@@ -59,7 +59,7 @@ public class App {
         deletingButton.addActionListener(e -> graphicPanel.setDeletingMode());
         leftPanel.add(deletingButton);
 
-        JRadioButton chooseVertexMode = new JRadioButton("Choose vertex", false);
+        JRadioButton chooseVertexMode = new JRadioButton("Choose vertices", false);
         chooseVertexMode.setFont(FONT_BUTTON);
         chooseVertexMode.addActionListener(e -> graphicPanel.setChooseVertexMode());
         leftPanel.add(chooseVertexMode);
@@ -105,7 +105,18 @@ public class App {
         readFileButton.addActionListener(e -> fileManager.readGraphFromFile());
         leftPanel.add(readFileButton);
 
-        JCheckBox nameCheck = new JCheckBox("Show name");
+        JButton helpButton = new JButton("Instruction");
+        helpButton.addActionListener(e -> JOptionPane.showMessageDialog(null,
+                "In vertex creation mode - draw a node with a mouse click.\n" +
+                        "In connect mode - click on the node, then on the node you want to join.\n" +
+                        "In deletion mode - by clicking the mouse, delete the elements of the graph.\n" +
+                        "In vertex selection mode - select the start and end vertices," +
+                        " then click the \"show ... path\" button, \n" + "to reset selected nodes, click on any other.",
+                "How to use", JOptionPane.INFORMATION_MESSAGE));
+        helpButton.setFont(FONT_BUTTON);
+        leftPanel.add(helpButton);
+
+        JCheckBox nameCheck = new JCheckBox("Show names");
         nameCheck.setFont(FONT_BUTTON);
         nameCheck.addActionListener(e -> {
             if (nameCheck.isSelected()) graphicPanel.setShowName(true);
@@ -122,6 +133,7 @@ public class App {
             graphicPanel.repaint();
         });
         leftPanel.add(weightCheck);
+
     }
 
 }

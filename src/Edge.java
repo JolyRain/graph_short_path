@@ -5,7 +5,7 @@ public class Edge {
     private Vertex endVertex;
     private Characteristic characteristic;
 
-    public int getNeedType(TypeRoad typeRoad) {
+    int getNeedType(TypeRoad typeRoad) {
         switch (typeRoad) {
             case CHEAP:
                 return characteristic.getCost();
@@ -17,42 +17,28 @@ public class Edge {
         return 0;
     }
 
-    public Edge(Vertex startVertex, Vertex endVertex, Characteristic characteristic) {
-        this.startVertex = startVertex;
-        this.endVertex = endVertex;
-        this.characteristic = characteristic;
-    }
-
-    public boolean contains(Vertex vertex) {
+    boolean contains(Vertex vertex) {
         return startVertex.equals(vertex) || endVertex.equals(vertex);
     }
 
-    public Edge(Vertex startVertex, Vertex endVertex) {
+    Edge(Vertex startVertex, Vertex endVertex) {
         this.startVertex = startVertex;
         this.endVertex = endVertex;
     }
 
-    public Vertex getStartVertex() {
+    Vertex getStartVertex() {
         return startVertex;
     }
 
-    public void setStartVertex(Vertex startVertex) {
-        this.startVertex = startVertex;
-    }
-
-    public Vertex getEndVertex() {
+    Vertex getEndVertex() {
         return endVertex;
     }
 
-    public void setEndVertex(Vertex endVertex) {
-        this.endVertex = endVertex;
-    }
-
-    public Characteristic getCharacteristic() {
+    Characteristic getCharacteristic() {
         return characteristic;
     }
 
-    public void setCharacteristic(Characteristic characteristic) {
+    void setCharacteristic(Characteristic characteristic) {
         this.characteristic = characteristic;
     }
 
@@ -73,6 +59,6 @@ public class Edge {
 
     @Override
     public String toString() {
-        return "<" + startVertex + ", " + endVertex + ">" + characteristic;
+        return "<" + startVertex + ", " + endVertex + ">" + " {" + characteristic + "}";
     }
 }

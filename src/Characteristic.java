@@ -5,41 +5,44 @@ public class Characteristic {
     private int time;
     private int cost;
 
-    public Characteristic(int distance, int time, int cost) {
+    Characteristic(int distance, int time, int cost) {
         this.distance = distance;
         this.time = time;
         this.cost = cost;
     }
 
-    public Characteristic(){}
+    Characteristic() {
+    }
 
-    public int getDistance() {
+    int getDistance() {
         return distance;
     }
 
-    public void setDistance(int distance) {
+    void setDistance(int distance) {
         this.distance = distance;
     }
 
-    public int getTime() {
+    int getTime() {
         return time;
     }
 
-    public boolean isValid() {
-        return distance > 0
-                && time > 0
-                && cost >= 0;
-    }
-
-    public void setTime(int time) {
+    void setTime(int time) {
         this.time = time;
     }
 
-    public int getCost() {
+    boolean isValid() {
+        return isCorrect(distance) && isCorrect(time) && isCorrect(cost);
+    }
+
+    private boolean isCorrect(int number) {
+        return number > 0 && number < Integer.MAX_VALUE;
+    }
+
+    int getCost() {
         return cost;
     }
 
-    public void setCost(int cost) {
+    void setCost(int cost) {
         this.cost = cost;
     }
 
@@ -60,6 +63,6 @@ public class Characteristic {
 
     @Override
     public String toString() {
-        return "d - " + distance + "\n" + " t - " + time + "\n" + " c - " + cost;
+        return "d-" + distance + ", t-" + time + ", c-" + cost;
     }
 }

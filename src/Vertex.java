@@ -1,28 +1,31 @@
-import java.awt.*;
 import java.util.Objects;
-import java.util.Random;
 
 public class Vertex {
     private String name;
     private int number;
 
-    public String getName() {
+    String getName() {
         return name;
     }
 
-    public void setName(String name) {
+    void setName(String name) {
         this.name = name;
     }
 
-    public Vertex() {
+    Vertex() {
     }
 
-    public Vertex(int number) {
+    Vertex(String name, int number) {
+        this.name = name;
+        this.number = number;
+    }
+
+    Vertex(int number) {
         this.number = number;
     }
 
 
-    public int getNumber() {
+    int getNumber() {
         return number;
     }
 
