@@ -1,8 +1,11 @@
+package frame;
+
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Rectangle2D;
 
 public class Circle extends Ellipse2D.Double {
     static final double RADIUS = 40.0;
+    static final double CORRECT_RADIUS = RADIUS / 2.0;
     private double x;
     private double y;
 

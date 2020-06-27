@@ -1,4 +1,9 @@
-import java.util.*;
+package graph;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.Stack;
 
 public class Path {
     private Graph graph;
@@ -6,12 +11,12 @@ public class Path {
     private Stack<Edge> path = new Stack<>();
     private int sum = 0;
 
-    Path(Graph graph, TypeRoad typeRoad) {
+    public Path(Graph graph, TypeRoad typeRoad) {
         this.graph = graph;
         this.typeRoad = typeRoad;
     }
 
-    Path(Graph graph) {
+    public Path(Graph graph) {
         this.graph = graph;
     }
 
@@ -25,11 +30,11 @@ public class Path {
         return value;
     }
 
-    boolean contains(Edge edge) {
+    public boolean contains(Edge edge) {
         return path.contains(edge);
     }
 
-    void countPath(Vertex startVertex, Vertex endVertex) {
+    public void countPath(Vertex startVertex, Vertex endVertex) {
         if (startVertex.equals(endVertex)) {
             sum = -1;
             return;
@@ -58,7 +63,7 @@ public class Path {
                     currentVertex = item.getKey();
                 }
             }
-            if (currentVertex == null){
+            if (currentVertex == null) {
                 sum = -1;
                 return;
             }
@@ -83,17 +88,17 @@ public class Path {
         }
     }
 
-    void clear() {
+    public void clear() {
         typeRoad = null;
         sum = 0;
         path.clear();
     }
 
-    int getSum() {
+    public int getSum() {
         return sum;
     }
 
-    TypeRoad getTypeRoad() {
+    public TypeRoad getTypeRoad() {
         return typeRoad;
     }
 }

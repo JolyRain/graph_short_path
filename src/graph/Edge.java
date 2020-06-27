@@ -1,9 +1,16 @@
+package graph;
+
 import java.util.Objects;
 
 public class Edge {
     private Vertex startVertex;
     private Vertex endVertex;
     private Characteristic characteristic;
+
+    public Edge(Vertex startVertex, Vertex endVertex) {
+        this.startVertex = startVertex;
+        this.endVertex = endVertex;
+    }
 
     int getNeedType(TypeRoad typeRoad) {
         switch (typeRoad) {
@@ -21,24 +28,19 @@ public class Edge {
         return startVertex.equals(vertex) || endVertex.equals(vertex);
     }
 
-    Edge(Vertex startVertex, Vertex endVertex) {
-        this.startVertex = startVertex;
-        this.endVertex = endVertex;
-    }
-
-    Vertex getStartVertex() {
+    public Vertex getStartVertex() {
         return startVertex;
     }
 
-    Vertex getEndVertex() {
+    public Vertex getEndVertex() {
         return endVertex;
     }
 
-    Characteristic getCharacteristic() {
+    public Characteristic getCharacteristic() {
         return characteristic;
     }
 
-    void setCharacteristic(Characteristic characteristic) {
+    public void setCharacteristic(Characteristic characteristic) {
         this.characteristic = characteristic;
     }
 

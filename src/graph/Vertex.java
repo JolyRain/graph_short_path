@@ -1,31 +1,32 @@
+package graph;
+
 import java.util.Objects;
 
 public class Vertex {
     private String name;
     private int number;
 
-    String getName() {
+    public Vertex() {
+    }
+
+    public Vertex(String name, int number) {
+        this.name = name;
+        this.number = number;
+    }
+
+    public Vertex(int number) {
+        this.number = number;
+    }
+
+    public String getName() {
         return name;
     }
 
-    void setName(String name) {
+    public void setName(String name) {
         this.name = name;
     }
 
-    Vertex() {
-    }
-
-    Vertex(String name, int number) {
-        this.name = name;
-        this.number = number;
-    }
-
-    Vertex(int number) {
-        this.number = number;
-    }
-
-
-    int getNumber() {
+    public int getNumber() {
         return number;
     }
 

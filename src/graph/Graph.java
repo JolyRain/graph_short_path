@@ -1,17 +1,19 @@
+package graph;
+
 import java.util.*;
 
-class Graph {
+public class Graph {
     private TreeMap<Vertex, Set<Vertex>> adjacentVerticesMap = new TreeMap<>(Comparator.comparingInt(Vertex::getNumber));
     private Set<Vertex> vertices = new HashSet<>();
     private List<Edge> edges = new LinkedList<>();
 
-    boolean addVertex(Vertex vertex) {
+    public boolean addVertex(Vertex vertex) {
         vertex.setNumber(vertices.size());
         adjacentVerticesMap.put(vertex, new HashSet<>());
         return vertices.add(vertex);
     }
 
-    Vertex getVertex(int number) {
+    public Vertex getVertex(int number) {
         for (Vertex vertex : vertices) {
             if (vertex.getNumber() == number) return vertex;
         }
@@ -27,14 +29,14 @@ class Graph {
         return false;
     }
 
-    Edge getEdge(Vertex start, Vertex end) {
+    public Edge getEdge(Vertex start, Vertex end) {
         for (Edge edge : edges) {
             if (edge.contains(start) && edge.contains(end)) return edge;
         }
         return null;
     }
 
-    void addEdge(Edge edge) {
+    public void addEdge(Edge edge) {
         Vertex startVertex = edge.getStartVertex();
         Vertex endVertex = edge.getEndVertex();
         if (!isAdjacent(startVertex, endVertex)) {
@@ -44,14 +46,14 @@ class Graph {
         }
     }
 
-    void removeVertex(Vertex deletingVertex) {
+    public void removeVertex(Vertex deletingVertex) {
         vertices.remove(deletingVertex);
         for (Vertex adjacentVertex : adjacentVerticesMap.get(deletingVertex)) {
             Set<Vertex> adjacentVertices = adjacentVerticesMap.get(adjacentVertex);
             adjacentVertices.removeIf(currentVertex -> currentVertex.equals(deletingVertex));
         }
-        edges.removeIf(deletingEdge -> deletingEdge.getStartVertex().equals(deletingVertex) ||
-                deletingEdge.getEndVertex().equals(deletingVertex));
+        edges.removeIf(deletingEdge -> deletingEdge.getStartVertex().equals(deletingVertex)
+                || deletingEdge.getEndVertex().equals(deletingVertex));
         adjacentVerticesMap.remove(deletingVertex);
         recountIndex(deletingVertex);
     }
@@ -64,23 +66,24 @@ class Graph {
         }
     }
 
-    void removeEdge(Vertex startVertex, Vertex endVertex) {
+    public void removeEdge(Vertex startVertex, Vertex endVertex) {
         Edge deletingEdge = new Edge(startVertex, endVertex);
         edges.removeIf(edge -> edge.equals(deletingEdge));
         adjacentVerticesMap.get(startVertex).removeIf(adjacentVertex -> adjacentVertex.equals(endVertex));
         adjacentVerticesMap.get(endVertex).removeIf(adjacentVertex -> adjacentVertex.equals(startVertex));
     }
 
-    void clear() {
+    public void clear() {
         if (adjacentVerticesMap != null) adjacentVerticesMap.clear();
         if (vertices != null) vertices.clear();
+        if (edges != null) edges.clear();
     }
 
     Iterable<Vertex> adjacent(Vertex vertex) {
         return adjacentVerticesMap.get(vertex);
     }
 
-    TreeMap<Vertex, Set<Vertex>> getAdjacentVerticesMap() {
+    public TreeMap<Vertex, Set<Vertex>> getAdjacentVerticesMap() {
         return adjacentVerticesMap;
     }
 

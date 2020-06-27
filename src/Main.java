@@ -1,3 +1,5 @@
+import frame.App;
+
 import javax.swing.*;
 
 public class Main {
@@ -5,8 +7,6 @@ public class Main {
             InstantiationException, IllegalAccessException {
         UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         java.awt.EventQueue.invokeLater(() -> new App().show());
-        int a = 999999;
-        int b = 999999;
     }
 }
 

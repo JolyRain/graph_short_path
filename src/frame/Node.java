@@ -1,3 +1,7 @@
+package frame;
+
+import graph.Vertex;
+
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
 
@@ -6,7 +10,7 @@ public class Node {
     private Vertex vertex;
     private Circle circle;
 
-    Node(Vertex vertex, Circle circle) {
+    public Node(Vertex vertex, Circle circle) {
         this.vertex = vertex;
         this.circle = circle;
     }

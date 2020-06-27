@@ -1,3 +1,7 @@
+package frame;
+
+import graph.Edge;
+
 import java.awt.*;
 import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
@@ -7,7 +11,7 @@ public class Line {
     private Line2D line;
     private Edge edge;
 
-    Line(Line2D line, Edge edge) {
+    public Line(Line2D line, Edge edge) {
         this.line = line;
         this.edge = edge;
     }
@@ -22,7 +26,7 @@ public class Line {
 
     Rectangle2D.Double getWeightLabel(Graphics2D graphics2D) {
         return new Rectangle2D.Double(((float) (line.getX1() + line.getX2()) / 2),
-                ((float)  (line.getY1() + line.getY2()) / 2),
+                ((float) (line.getY1() + line.getY2()) / 2),
                 graphics2D.getFontMetrics().stringWidth(edge.getCharacteristic().toString()),
                 LABEL_FONT.getSize());
     }

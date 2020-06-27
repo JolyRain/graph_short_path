@@ -1,7 +1,11 @@
+package frame;
+
+import graph.TypeRoad;
+
 import javax.swing.*;
 import java.awt.*;
 
-class App {
+public class App {
     private static final int WIDTH = 1280;
     private static final int HEIGHT = 720;
     private static final int ZERO = 0;
@@ -12,7 +16,7 @@ class App {
     private JPanel leftPanel;
     private FileManager fileManager;
 
-    App() {
+    public App() {
         createFrame();
         initElements();
         fileManager = new FileManager(graphicPanel);
@@ -28,7 +32,7 @@ class App {
         frame.setResizable(false);
     }
 
-    void show() {
+    public void show() {
         frame.setVisible(true);
     }
 
@@ -80,7 +84,7 @@ class App {
         showShort.addActionListener(e -> graphicPanel.showPath(TypeRoad.SHORT));
         leftPanel.add(showShort);
 
-        JButton showCheaper = new JButton("Show cheaper path");
+        JButton showCheaper = new JButton("Show cheap path");
         showCheaper.setFont(FONT_BUTTON);
         showCheaper.addActionListener(e -> graphicPanel.showPath(TypeRoad.CHEAP));
         leftPanel.add(showCheaper);

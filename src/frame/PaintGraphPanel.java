@@ -1,3 +1,7 @@
+package frame;
+
+import graph.*;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
@@ -7,7 +11,6 @@ import java.awt.geom.Rectangle2D;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
-import java.util.function.UnaryOperator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -296,18 +299,13 @@ public class PaintGraphPanel extends JPanel {
     private Line setNewLine(Node startNode, Node endNode) {
         Circle circleStart = startNode.getCircle();
         Circle circleEnd = endNode.getCircle();
-        double radius = correctRadius();
+        double radius = Circle.CORRECT_RADIUS;
         return new Line(new Line2D.Double(
                 circleStart.getX() + radius,
                 circleStart.getY() + radius,
                 circleEnd.getX() + radius,
                 circleEnd.getY() + radius),
                 graph.getEdge(startNode.getVertex(), endNode.getVertex()));
-    }
-
-    private double correctRadius() {
-        UnaryOperator<Double> operator = number -> number / 2.0;
-        return operator.apply(Circle.RADIUS);
     }
 
     void setShowName(boolean showName) {
@@ -429,8 +427,8 @@ public class PaintGraphPanel extends JPanel {
     private class CreatingVertexMode extends MouseAdapter {
         @Override
         public void mouseClicked(MouseEvent event) {
-            double x = event.getX() - correctRadius();
-            double y = event.getY() - correctRadius();
+            double x = event.getX() - Circle.CORRECT_RADIUS;
+            double y = event.getY() - Circle.CORRECT_RADIUS;
             String name = inputVertex.getNameVertex();
             if (name == null || name.equals("")) return;
             Vertex newVertex = new Vertex();
@@ -532,7 +530,7 @@ public class PaintGraphPanel extends JPanel {
         private boolean setNewLine(Node node) {
             Circle circleStart = startNode.getCircle();
             Circle circleEnd = node.getCircle();
-            double radius = correctRadius();
+            double radius = Circle.CORRECT_RADIUS;
             Edge newEdge = new Edge(startNode.getVertex(), node.getVertex());
             Characteristic characteristic = inputRoad.getCharacteristic();
             if (characteristic == null) return false;

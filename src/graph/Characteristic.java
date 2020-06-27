@@ -1,3 +1,5 @@
+package graph;
+
 import java.util.Objects;
 
 public class Characteristic {
@@ -5,20 +7,20 @@ public class Characteristic {
     private int time;
     private int cost;
 
-    Characteristic(int distance, int time, int cost) {
+    public Characteristic(int distance, int time, int cost) {
         this.distance = distance;
         this.time = time;
         this.cost = cost;
     }
 
-    Characteristic() {
+    public Characteristic() {
     }
 
     int getDistance() {
         return distance;
     }
 
-    void setDistance(int distance) {
+    public void setDistance(int distance) {
         this.distance = distance;
     }
 
@@ -26,11 +28,11 @@ public class Characteristic {
         return time;
     }
 
-    void setTime(int time) {
+    public void setTime(int time) {
         this.time = time;
     }
 
-    boolean isValid() {
+    public boolean isValid() {
         return isCorrect(distance) && isCorrect(time) && isCorrect(cost);
     }
 
@@ -42,7 +44,7 @@ public class Characteristic {
         return cost;
     }
 
-    void setCost(int cost) {
+    public void setCost(int cost) {
         this.cost = cost;
     }
 
