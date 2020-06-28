@@ -20,8 +20,8 @@ public class PaintGraphPanel extends JPanel {
     private static final int LINE_WIDTH = 35;
     private static final int LINE_HEIGHT = 5;
     private static final int ZERO = 0;
-    private static final int LABEL_CHROMATIC_NUMBER_X = 10;
-    private static final int LABEL_CHROMATIC_NUMBER_Y = 660;
+    private static final int LABEL_SUM_X = 10;
+    private static final int LABEL_SUM_Y = 660;
 
     private List<Node> nodes = new LinkedList<>();
     private List<Line> lines = new LinkedList<>();
@@ -69,8 +69,9 @@ public class PaintGraphPanel extends JPanel {
 
     private void paintSum(Graphics2D graphics2D) {
         graphics2D.setColor(Color.BLACK);
-        graphics2D.drawString("SUM OF " + path.getTypeRoad() + " PATH: " + path.getSum(),
-                LABEL_CHROMATIC_NUMBER_X, LABEL_CHROMATIC_NUMBER_Y);
+        graphics2D.drawString("SUM OF " + path.getTypeRoad()
+                + " PATH: " + path.getSum(),
+                LABEL_SUM_X, LABEL_SUM_Y);
     }
 
     private void setPaintSettings(Graphics2D graphics2D) {
@@ -112,7 +113,7 @@ public class PaintGraphPanel extends JPanel {
                 graphics2D.fill(label);
                 graphics2D.setColor(Color.BLACK);
                 graphics2D.drawString(characteristic.toString(),
-                        (float) label.getX(),
+                        (float) (label.getX()),
                         (float) (label.getY() + label.getHeight()));
             }
         }

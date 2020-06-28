@@ -25,10 +25,12 @@ public class Line {
     }
 
     Rectangle2D.Double getWeightLabel(Graphics2D graphics2D) {
-        return new Rectangle2D.Double(((float) (line.getX1() + line.getX2()) / 2),
+        Rectangle2D rectangle = new  Rectangle2D.Double(((float) ((line.getX1() + line.getX2()) / 2)),
                 ((float) (line.getY1() + line.getY2()) / 2),
                 graphics2D.getFontMetrics().stringWidth(edge.getCharacteristic().toString()),
                 LABEL_FONT.getSize());
+        return new Rectangle2D.Double(rectangle.getX() - (rectangle.getCenterX() - rectangle.getX()),
+                rectangle.getY(), rectangle.getWidth(), rectangle.getHeight());
     }
 
     @Override
